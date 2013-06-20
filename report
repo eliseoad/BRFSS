@@ -1,0 +1,1566 @@
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+% REPORT PREPARED BY: 
+% JOSE A. BARTOLOMEI DIAZ, ALEJANDRO AMILL AND ELISEO ACEVEDO DIAZ
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%---------------------------------------------------------------------------------------------------
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%DESCRIPTION: LATEX TEMPLATE WITH RED HEADINGS
+%PREPARED BY: ELISEO ACEVEDO DIAZ
+%EMAIL:EACEVEDO@SALUD.GOV.PR
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%                           LOAD LaTeX PACKAGES                              %%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[DIV=calc, paper=a4, fontsize=12pt]{scrartcl} % A4 paper and 11pt font size
+
+\usepackage[utf8]{inputenc}
+\usepackage{color}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{multicol}
+\usepackage{endnotes}
+\usepackage{longtable}
+\usepackage{supertabular}
+\usepackage{lscape}
+\usepackage{float}
+\usepackage{fancyref}
+\usepackage{here}
+\usepackage{wrapfig}
+\usepackage{setspace}
+\usepackage{graphicx}
+\usepackage{marginnote}
+\usepackage[tc]{titlepic}
+\usepackage{subfigure}
+\usepackage{lscape}
+%\usepackage[none]{hyphenat}
+\usepackage{hyperref}
+\usepackage{lipsum} % Used for inserting dummy 'Lorem ipsum' text into the template
+\usepackage[english]{babel} % English language/hyphenation
+%\usepackage[protrusion=true,expansion=true]{microtype} % Better typography
+\usepackage{amsmath,amsfonts,amsthm} % Math packages
+\usepackage[svgnames]{xcolor} % Enabling colors by their 'svgnames'
+\usepackage[hang, small,labelfont=bf,up,textfont=it,up]{caption} % Custom captions under/above 
+                                                                 % floats in tables or figures
+\usepackage{booktabs} % Horizontal rules in tables
+\usepackage{fix-cm}   % Custom font sizes - used for the initial letter in the document
+\usepackage[margin=1in, paperwidth=8.5in, paperheight=11.5in]{geometry}  %% SEPECIFIED IN THE 
+                                                                         %% DOCUMENTCLASS
+\usepackage{multicol} % LOADS MULTICOLUMNS ENVIROMENT
+\usepackage{xifthen} % FOR EVERY CONDITIONAL STATEMENT IN THE LaTeX LANGUAGE
+
+\usepackage{helvet}
+\usepackage{verbatim}
+
+%\usepackage{draftwatermark} % Comment this line to delete the draft watermark
+
+\renewcommand{\familydefault}{\sfdefault}
+
+
+\usepackage{sectsty} % Enables custom section titles
+\allsectionsfont{\usefont{OT1}{phv}{b}{n}} % Change the font of all section commands
+
+\usepackage{fancyhdr} % Needed to define custom headers/footers
+\pagestyle{fancy} % Enables the custom headers/footers
+\usepackage{lastpage} % Used to determine the number of pages in the document(for "Page X of Total")
+
+\definecolor{MyPurple}{RGB}{64, 51, 81}
+
+\usepackage{titling} % Allows custom title configuration
+% Headers - all currently empty
+\lhead{}
+\chead{}
+\rhead{}
+
+% Footers
+\lfoot{}
+\cfoot{{\color{Black}\footnotesize Page \thepage\ of \pageref{LastPage}}} % "Page 1 of 2"
+\rfoot{} 
+
+\renewcommand{\headrulewidth}{0.0pt} % No header rule
+%\renewcommand{\footrulewidth}{0.4pt} % Thin footer rule
+
+
+\newcommand{\initial}[1]{ % Defines the command and style for the first letter
+\lettrine[lines=3,lhang=0.3,nindent=0em]{
+\color{DarkGoldenrod}
+{\textsf{#1}}}{}}
+
+\setcounter{secnumdepth}{0}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%                           LOAD R WORKSPACE                                 %%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+<<rm, echo=FALSE, results='hide', warning=FALSE, message=FALSE, error=FALSE>>= 
+rm(list = ls()[!ls() %in% c("FileR", "brfss.sd", "cbrfss.sd")])
+gc()
+
+@
+
+
+<<set_Globals, echo=FALSE, results='hide', warning=FALSE, message=FALSE>>=
+if (Sys.info()["sysname"] == "Linux"){
+source("/media/truecrypt2/ORP2/BRFSS/set_GlobalMeasures.R")
+} else if (Sys.info()["sysname"] == "Windows"){
+  source ("F:/set_GlobalMeasures.R")
+}
+@
+
+<<load, echo=FALSE, results='hide', warning=FALSE, message=FALSE>>= 
+# Load the curated BRFSS of aggregated data form 2008 to 2010
+
+ # Load Adult prevalence object
+File <- paste(set_File, "/Object_Adult_Prevalence.RData", sep = "" )
+load(file = File)
+
+# Load Adult frequency object
+File <- paste(set_File, "/Object_Adult_Freq.RData", sep = "" )
+load(file = File)
+
+# Load Child frequency object
+File <- paste(set_File2, "/Object_Child_Freq.RData", sep = "" )
+load(file = File)
+
+# Load child prevalence object 
+File <- paste(set_File2, "/Object_Child_Prevalence.RData", sep = "" )
+load(file = File)
+
+ # Load Adult Population
+File <- paste("/media/truecrypt2/ORP2/Population_Estimates/BRFSS_Pop/Objects/",
+              set_CountryF, "/", set_Years,
+              "/Adult/Object_Adult_Pop_Dist.RData", sep = "")
+load(file = File)  
+     
+ # Load Child Population
+File <- paste("/media/truecrypt2/ORP2/Population_Estimates/BRFSS_Pop/Objects/",
+              set_CountryF, "/", set_Years,
+              "/Child/Object_Child_Pop_Dist.RData", sep = "")
+load(file = File)  
+
+# Load logisitc regresion table results for adults and child 2008-2010
+File <- paste(set_File, "/Objects_Regression_Models.RData", sep = "" )
+load(file = File)
+@
+
+
+<<load_library, warning=FALSE, message=FALSE, echo=FALSE, results='hide'>>=
+
+options(digits = 2)
+library(survey)
+library(xtable)
+library(Hmisc)
+library(ggplot2)
+
+
+#cbrfss.sd <- svydesign(ids = ~0, strata = ~iyear + ststr, weights = ~newcfwt, 
+ #                      nest=TRUE, data = CBRFSS)
+
+#cbrfss.sd <- as.svydesign2(cbrfss.sd)
+
+#brfss_ads.sd <- svydesign(ids = ~0, strata = ~iyear + ststr, weights = ~aggfwt, 
+ #                      nest=TRUE, data = BRFSS_ADS)
+
+#brfss_ads.sd <- as.svydesign2(brfss_ads.sd)
+@
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%                        Definition of global functions                      %%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+<<t_model_funct, echo=FALSE, results='hide', warning=FALSE, message=FALSE>>=
+if (Sys.info()["sysname"] == "Linux"){
+  source("/media/truecrypt2/ORP2/Functions/t_model_funct.R")
+} else if (Sys.info()["sysname"] == "Windows"){
+source("F:/Functions/t_model_funct.R")
+}
+
+@
+
+%----------------------------------------SPECIAL FUNCTIONS-----------------------------------------%
+% THIS FUNCTION PERFORM A DYNAMIC BULLET EVERYTIME IS INVOKE RELATING THE STATISTICAL  %
+% SIGNIFICANCE, THE PUNCTUAL ODDS RATIO (OR) ESTIMATION AND ITS INTERPRETATION IN EACH CASE.       %
+% IDEA BY: Jose A. Bartolomei and Eliseo Acevedo
+% FUNCTION DEVELOPED BY Eliseo Acevedo 
+% FUCTION EDITED bY: Eliseo Acevedo and José A. Bartolomei
+%----------------------------------------SPECIAL FUNCTIONS-----------------------------------------%
+
+<<Funct4Interp, echo=FALSE, results='hide', warning=FALSE, message=FALSE>>=
+if (Sys.info()["sysname"] == "Linux"){
+  source("/media/truecrypt2/ORP2/Functions/Funct4Interp.R")
+} else if (Sys.info()["sysname"] == "Windows"){
+source("F:/Functions/Funct4Interp.R")
+}
+@
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%                             TITLE SECTION                                  %%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%\newcommand{\HorRule}{\color{MyPurple} \rule{\linewidth}{1pt}} % Defines the gold horizontal 
+                                                                    % rule around the title
+
+\pretitle{\vspace{-40pt} \begin{flushleft} \HorRule \fontsize{23}{15} \usefont{OT1}{phv}{b}{n} 
+\color{MyPurple} \selectfont} % Horizontal rule before the title
+
+\title{Puerto Rico Asthma Surveillance Update, \Sexpr{set_Years}\\
+\small{(\Sexpr{set_MeasureU})}\\
+\small{version \today}}% Your article title
+
+%\posttitle{\par\end{flushleft}\vskip 1cm} % Whitespace under the title
+
+\preauthor{\begin{flushleft}\large \lineskip 0.5em \usefont{OT1}{phv}{b}{sl} 
+\color{MyPurple}} % Author font configuration
+
+\author{Jos\'e A. Bartolomei-D\'iaz, PhD and Eliseo Acevedo-D\'iaz, MPH}%Your name
+% Alejandro Amill, MPH;
+\postauthor{\footnotesize \usefont{OT1}{phv}{m}{sl} \color{Black}}%Configuration for the institution 
+
+%\par\end{flushleft}\HorRule} % Horizontal rule after the title
+
+\date{} % Add a date here if you would like one to appear underneath the title block
+\doublespacing %DOUBLESPACE COMAND
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%                          BEGINING OF DOCUMENT                              %%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\color{MyPurple}
+
+\usepackage{eso-pic}
+\newcommand\BackgroundPic{
+\put(-1,0){
+\parbox[b][\paperheight]{\paperwidth}{%
+%\vfill
+\centering
+\ifthenelse{\Sexpr{(Sys.info()["sysname"] == "Linux")}}{
+\includegraphics[height=\paperheight,width=\paperwidth]{/media/truecrypt2/ORP/Logos/Template_Portada_Surveillance_Report_1.pdf}}
+{ % TEMPLATES IDEAS AND ART BY SIXTO MERCED
+\includegraphics[height=\paperheight,width=\paperwidth]{C:/Users/eacevedo/Desktop/Template_Portada_Surveillance_Report}}%
+%\vfill
+}}}
+\newcommand\ABackgroundPic{
+\put(-1,0){
+\parbox[b][\paperheight]{\paperwidth}{%
+%\vfill
+\centering
+\ifthenelse{\Sexpr{(Sys.info()["sysname"] == "Linux")}}{
+\includegraphics[height=\paperheight,width=\paperwidth]{/media/truecrypt2/ORP/Logos/Template_Portada_Surveillance_Report_2.pdf}}
+{\includegraphics[height=\paperheight,width=\paperwidth]{C:/Users/eacevedo/Desktop/Template_Portada_Surveillance_Report1}}%
+%\vfill
+}}}
+
+
+\begin{document}
+
+\AddToShipoutPicture*{\BackgroundPic}
+
+\maketitle% Print the title
+
+\thispagestyle{fancy} % Enabling the custom headers/footers for the first page 
+
+\vfill
+\begin{figure}[h]
+\centering
+
+\mbox{\subfigure{\includegraphics[width=60mm, height=25mm]{/media/truecrypt2/ORP/Logos/Logo_Salud_2013.jpg}}\quad
+\subfigure{\includegraphics[width=80mm,height=22.5mm]{/media/truecrypt2/ORP/Logos/Logo_PRAP_Ingles.jpg}}}
+
+\end{figure}
+
+
+\newpage
+\AddToShipoutPicture{\ABackgroundPic}
+
+\tableofcontents %OUTCOMES THE TABLE OF CONTENT
+\newpage
+\listoftables    %OUTCOMES THE LIST OF TABLES IN THE DOCUMENT
+\newpage
+\listoffigures   %OUTCOMES THE LIST OF FIGURES IN THE DOCUMENT
+\newpage         %CONTINUES IN A NEW PAGE
+\doublespacing %DOUBLESPACE COMAND
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%                                ABSTRACT                                    %%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%ABSTRACT HERE
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%                                 ARTICLE                                    %%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% begin{multicols}{2} % BEGINS MULTICOLS ENVIROMENT WITH 2 COLUMNS
+
+\newenvironment{changemargin}[2]{%
+\begin{list}{}{%
+\setlength{\topsep}{0pt}%
+\setlength{\leftmargin}{#1}%
+\setlength{\rightmargin}{#2}%
+\setlength{\listparindent}{\parindent}%
+\setlength{\itemindent}{\parindent}%
+\setlength{\parsep}{\parskip}%
+}%
+\item[]}{\end{list}}
+
+
+% --------------------------------------------------------------------------------------
+ % Executive Summary
+% --------------------------------------------------------------------------------------
+\newpage
+\section{Executive summary}
+
+Dear colleagues;
+
+The following asthma surveillance update represents the Asthma Project effort to be as timely as possible in reporting asthma related health indicators and evidence the effort to design, implement, and sustain an ``Asthma Epidemiological Surveillance System".The data used for this update was the latest availbe at the Center for Disease, Control and Prevention web site at the date of publication.
+
+Is of general knowlege that asthma is an important health issue in Puerto Rico.  The Puerto Rico Asthma Project has intensively worked to address this chronic condition from a public health perspective in collaboration with governmental, non-profit, profit and community based organizations to ahchive our goal of reduce the mortality and morbidity due to this condition, and incrase the quality of life of our population with asthma.
+
+Sincerely,\\
+\\
+
+Francico Joglar Pesquera, MD
+
+Puerto Rico Secretary of Health
+
+%---------------------------------------------------------------------------------------------------
+%            Acknowledgment
+%---------------------------------------------------------------------------------------------------
+\newpage
+\section{Acknowledgements}
+ 
+This document was prepared by:
+ 
+\begin{itemize}
+ 
+\item Jos\'e A. Bartolomei-D\'iaz, MS, Ph.D \\ Puerto Rico Asthma Project, Epidemiologist
+
+\item Eliseo Acevedo-D\'iaz, MPH \\ Puerto Rico Asthma Project, Biostatician
+
+\end{itemize}
+
+We thanks our team partners for their support, excellent recomendations, and editing:
+\begin{itemize}
+ 
+\item Wanda I. Hern\'andez-Virella, MPH \\ Puerto Rico Asthma Project, Coordinator
+ 
+\item Mar\'ia C. S\'anchez G\'omez, MS \\ Puerto Rico Asthma Project, Evaluator
+ 
+\item Manuel Vargas-Bernal, MD, MPH \\ Director - Maternal, Child \& Adolescent Health Division
+
+\item Dan Burrows \\ Project Officer - Air Pollution and Respiratory Health Branch, Center for Disease Control \& Prevention
+
+\item Cathy Bailey \\ Surveillance Team Lead - Air Pollution and Respiratory Health Branch, Center for Disease Control \& Prevention 
+
+\item Sheri Disler \\ Evaluator Technical Advisor - Air Pollution and Respiratory Health Branch, Center for Disease Control \& Prevention
+
+\item Carlos Alonso \\ Program Official - Air Pollution and Respiratory Health Branch, Center for Disease Control \& Prevention
+ 
+\end{itemize}
+ 
+We would also like to thank several people, who in one way or another, have contributed with the asthma project developing this report:
+ 
+\begin{itemize}
+ 
+\item Francisco Joglar-Pesquera, MD \\ Puerto Rico Secretary of Health
+ 
+\item Ruby Serrano-Rodr\'iguez, MS, DrPH \\ Director \& State Coordinator - BRFSS Office, Puerto Rico\\
+      Epidemiology \& Research Office
+     
+\item \'Alvaro U. Aranda, MD \\ President - Puerto Rico Asthma and Other Chronic Respiratoy Diseases Coalition
+ 
+\end{itemize}
+ 
+Special thanks to all of our colleagues of the Mothers, Children and Adolescents Division of the Puerto Rico Health Department, to Sixto Merced for create the art of this document and Alejandro Amill for help us understand the trasnsition to the 2011 BRFSS methodolgy.
+ 
+\newpage
+%---------------------------------------------------------------------------------------------------
+%            Author Note
+%---------------------------------------------------------------------------------------------------
+
+\newpage
+\section{Author note}
+
+\subsection{About this report}
+
+This update reports is part of our commitment to continue learning and implementing cost-effective technological tools to improve this epidemiological surveillance system and enhancing its attributes of acceptability, flexibility, simplicity, stability, and timeliness and making important asthma information timely as possible. Is our expectation to work in producing an update as soon the data is available.  All updates will be included at at\\
+\url{www.proyectoasmapr.org/Vigilancia.html}
+
+We continue our effort in creating an easy to read and understand guide for public health planning and interventions.  With that aim, we are providing here what is so far our standard report with measures of the magnitude of a health indicators (e.g. prevalence, mortality, use of health services) across the different populations (e.g. age, sex, income, etc.) and the risk or possibility of having a health indicator (e.g. relative risk, odds ratios, etc.). The health indicator estimate is the proportion of individuals with the condition at the stratified group.  This measure can help with economic and human resources allocation. The risk is a burden guide for groups selection to prioritize interventions. Furthermore, you will find a document structure where in every page there is a brief interpretation on the observed health indicator, a brief interpretation of the risk measure followed by a graph and a table with the pertinent information.
+
+\subsection{Peer review}
+
+This document has been evaluated by the Puerto Rico Asthma Project Staff. We want you to take part in improving this surveillance system and reports. We encourage any reader to evaluate this document and send recommendations at\\
+info@proyectoasmapr.org.\\
+
+\subsection{Citation}
+
+When use this document we suggest the following citation:
+
+J.A. Bartolomei-D\'iaz and E. Acevedo. Puerto Rico asthma surveillance 2011 update.
+Technical report, Puerto Rico Asthma Project, Puerto Rico Department of Health,
+\today{}.\\
+
+\subsection{Current version}
+
+In this version (\today{}) you will find all the measures contained within the April 26, 2011 asthma report but using the 2011 Puerto Rico BRFSS data.  All procedures and methodologies in this updates are posted in our web page in a document title Puerto Rico Asthma surveillance methods.  Our standard report contains current asthma measures among adults and children stratified by socio-demographic, health related quality of life and risk factors. 
+
+The 2011 BRFSS survey was conducted implementing a new sampling methodology.  Furhtermore, 2011 data can not be aggregated with those of previous years. The CDC strongly recomend to start a new trend from 2011 unwards. Please refere to the BRFSS official web site at \url{http://www.cdc.gov/brfss/} for details on methods changes.
+
+
+\subsection{Next version}
+
+We are in advance stages to finish our work towards obtaining asthma inidicators on medical interventions, asthma medication use, asthma education and asthma control. The information came from the follow-up asthma survey called the "Asthma Call Back" (ACB).
+
+It is in on our best interest the extensive use of this information for public health policy, research questions \& proposal development.\\
+
+Sincerely,\\
+
+Jos\'{e} A. Bartolomei D\'{i}az, PhD
+
+
+%----------------------------------------------------------------------------------------
+%            RESULTS
+%----------------------------------------------------------------------------------------
+
+\newpage
+\section{Results: Asthma among adults}
+
+\subsection{\Sexpr{set_Measure} time trend}
+
+%----------------------------FIRST FIGURE------------------------------------------------
+
+\begin{figure}[H]
+\caption{\Sexpr{set_Measure} among \Sexpr{set_Population} in \Sexpr{set_Country}, 2011}
+\label{fig:PR2011}
+<<Pr2011, echo=FALSE, fig.height= 4, results='asis', fig.align='center'>>=
+p.asma.current.year
+@
+
+\end{figure}
+
+%----------------------------------------------------------------------------------------
+
+\begin{itemize}
+
+
+\item The \Sexpr{set_Measure} for the year \Sexpr{set_Years} among \Sexpr{set_Population} in \Sexpr{set_Country} was \Sexpr{t.asma.current.year.m}, Figure \ref{fig:PR2011}.
+
+\end{itemize}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%                     Definition of matrices for the tables                  %%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newpage
+\subsection{Socio-demographics}
+
+\begin{itemize}
+
+\item Figure \ref{fig:age} shows that the \Sexpr{set_MeasureL} for the age group of
+\Sexpr{rownames(tabl.ageg2)[which.max(t.asma.current.ageg2.df[1:6,2] *10000)]}
+was higher when compared with the other groups.
+
+\item Adults in the age group of \Sexpr{Funct4Interp(type = "or", tabl.ageg2, "the")} See Table \ref{tab:age}.
+
+
+\end{itemize}
+
+
+\begin{figure}[H]
+\caption{\Sexpr{set_Measure} among \Sexpr{set_Population} by age group, 
+\Sexpr{set_Years}}
+<<ageg2, fig.align='center', echo=FALSE, fig.height=3>>=
+p.asma.current.ageg2
+@
+\label{fig:age}
+\end{figure}
+
+<<ageg.t, echo=FALSE, results='asis', fig.align='center'>>=
+latex(tabl.ageg2,
+      title="Variables",
+      file = "",
+      append = TRUE,
+      rgroup = "Age group",
+      #n.rgroup = c(6
+      #            ),
+      colhead = c("Prevalence","Population Total (N)", "OR", "OR(SE)", "p-value"),
+      longtable = F,
+      table.env = T,
+      here = T,
+      caption = paste(set_Measure, " among adults by age group,", set_Years,
+                      sep = " "),
+      label = "tab:age")
+@
+
+\newpage
+\begin{itemize}
+
+\item Figure \ref{fig:sex} shows a that males had a \ifthenelse{
+\Sexpr{floor(as.numeric(t.asma.current.sex.df[1,2])*10000)} < 
+\Sexpr{floor(as.numeric(t.asma.current.sex.df[2,2])*10000)}}{lower}{higher} \Sexpr{set_MeasureL} when compared with females.
+
+%\item Table \ref{tab:sex} shows the estimates for persons living with \Sexpr{set_Disease} in 
+%\Sexpr{set_Country} with it 95\% confidence interval.
+
+\item Among adults, \Sexpr{Funct4Interp(type = "or", tabl.sex, "had")} of reporting \Sexpr{set_MeasureL} when compared with male. \Sexpr{Funct4Interp(type = "or", tabl.sex, "sig")} See Table \ref{tab:sex}.
+
+\end{itemize}
+
+\begin{figure}[H]
+\caption{\Sexpr{set_Measure} among \Sexpr{set_Population} by sex group, 
+\Sexpr{set_Years}}
+<<sex, fig.align='center', echo=FALSE, fig.height=4, fig.width=5>>=
+p.asma.current.sex
+@
+\label{fig:sex}
+\end{figure}
+
+<<sex.t, echo=FALSE, results='asis', fig.align='center'>>=
+latex(tabl.sex,
+      title="Variables",
+      file = "",
+      append = TRUE,
+      rgroup = "Sex group",
+      #n.rgroup = c(6
+       #            ),
+      colhead = c("Prevalence","Population Total (N)", "OR", "OR(SE)", "p-value"),
+      longtable = F,
+      table.env = T,
+      here = T,
+      caption = paste(set_Measure, " among adults by sex group,", set_Years,
+                      sep = " "),
+      label = "tab:sex")
+@
+
+\newpage
+\begin{itemize}
+
+\item When comparing by education level, those with
+\Sexpr{tolower(rownames(tabl.educag3)[which.max(t.asma.current.educag.df[1:4,2] *10000)])}
+ have the highest \Sexpr{set_MeasureL}.
+(Figure \ref{fig:edu}).
+
+\item When comparing by educational level, those who were \Sexpr{Funct4Interp(type = "or", tabl.educag3, "had")} of reporting \Sexpr{set_MeasureL} when compared with those who report having some high school. \Sexpr{Funct4Interp(type = "or", tabl.educag3, "sig")} Data shown in Table \ref{tab:edu}.
+
+\end{itemize}
+
+\begin{figure}[H]
+\caption{\Sexpr{set_Measure} among \Sexpr{set_Population} by education levels, 
+\Sexpr{set_Years}}
+<<educag, fig.align='default', echo=FALSE, fig.height=3.5, fig.width=7>>=
+p.asma.current.educag
+@
+\label{fig:edu}
+\end{figure}
+
+<<edu.t, echo=FALSE, results='asis', fig.align='center'>>=
+latex(tabl.educag3,
+      title="Variables",
+      file = "",
+      append = TRUE,
+      rgroup = "Education group",
+      #n.rgroup = c(6
+       #            ),
+      colhead = c("Prevalence","Population Total (N)", "OR", "OR(SE)", "p-value"),
+      longtable = F,
+      table.env = T,
+      here = T,
+      caption = paste(set_Measure, " among adults by education levels,", set_Years,
+                      sep = " "),
+      label = "tab:edu")
+@
+
+\newpage
+\begin{itemize}
+
+\item Figure \ref{fig:income} shows that adults whose annual household income is 
+\Sexpr{latexTranslate(tolower(rownames(tabl.incomg)[which.max(t.asma.current.incomg.df[1:5,2] *10000)]))}, have a \Sexpr{set_MeasureL} higher than the other annual income groups.
+
+\item Among annual income of the interviewee, those in the range of \Sexpr{Funct4Interp(type = "or", tabl.incomg, "est")} those whose annual income is less than \$ 14,999. \Sexpr{Funct4Interp(type = "or", tabl.incomg, "sig")}  For further information, refere to Table \ref{tab:income}.
+
+\end{itemize}
+
+\begin{figure}[H]
+\caption{\Sexpr{set_Measure} among \Sexpr{set_Population} by household income levels, 
+\Sexpr{set_Years}}
+<<incomg, fig.align='center', echo=FALSE, fig.height=3.5, fig.width=7>>=
+p.asma.current.incomg
+@
+\label{fig:income}
+\end{figure}
+
+<<income.t, echo=FALSE, results='asis', fig.align='center'>>=
+latex(tabl.incomg,
+      title="Variables",
+      file = "",
+      append = TRUE,
+      rgroup = "Income group",
+      #n.rgroup = c(6
+       #            ),
+      colhead = c("Prevalence","Population Total (N)", "OR", "OR(SE)", "p-value"),
+      longtable = F,
+      table.env = T,
+      here = T,
+      caption = paste(set_Measure, " among adults by income levels,", set_Years,
+                      sep = " "),
+      label = "tab:income")
+@
+
+\newpage
+\begin{itemize}
+
+\item Adults who were 
+\Sexpr{tolower(rownames(tabl.marital)[which.max(t.asma.current.marital2.df[1:6,2] *10000)])} at the time of the interview, had the highest asthma prevalence among marital status. Refere to \ref{fig:marital}.
+
+\item Those who were \Sexpr{Funct4Interp(type = "or", tabl.marital, "being")} Refere to Table \ref{tab:marital}.
+
+\end{itemize}
+
+\begin{figure}[H]
+\caption{\Sexpr{set_Measure} among \Sexpr{set_Population} by marital status,
+\Sexpr{set_Years}}
+\label{fig:marital}
+<<marital2, fig.align='center', echo=FALSE, fig.height=3.5, fig.width=7.5>>=
+p.asma.current.marital2
+@
+\end{figure}
+
+<<marital.t, echo=FALSE, results='asis', fig.align='center'>>=
+latex(tabl.marital,
+      title="Variables",
+      file = "",
+      append = TRUE,
+      rgroup = "Marital group",
+      #n.rgroup = c(6
+       #            ),
+      colhead = c("Prevalence","Population Total (N)", "OR", "OR(SE)", "p-value"),
+      longtable = F,
+      table.env = T,
+      here = T,
+      caption = paste(set_Measure, " among adults by marital status,", set_Years,
+                      sep = " "),
+      label = "tab:marital")
+@
+
+
+\newpage
+\begin{itemize}
+
+
+\item Those adults who were 
+\Sexpr{tolower(rownames(tabl.emplrec2)[which.max(t.asma.current.employ.df[1:6,2] *10000)])} at the moment of the interview, had the highest \Sexpr{set_MeasureL} (Figure \ref{fig:employ}).
+
+\item Adults who were \Sexpr{Funct4Interp(type = "or", tabl.emplrec2, "being")} 
+Data shown in Table \ref{tab:employ}.
+
+%\item Those who are \Sexpr{rownames(t.asma.current.socio)[24]}, 
+%\Sexpr{rownames(t.asma.current.socio)[25]}, \Sexpr{rownames(t.asma.current.socio)[26]} or,
+%\Sexpr{rownames(t.asma.current.socio)[27]} have the same \Sexpr{set_Measure} in statistical terms.
+
+\end{itemize}
+
+\begin{figure}[H]
+\caption{\Sexpr{set_Measure} among \Sexpr{set_Population} by employment status, 
+\Sexpr{set_Years}}
+\label{fig:employ}
+<<employ, fig.align='center', echo=FALSE, fig.height=3.5, fig.width=7>>=
+p.asma.current.employ
+@
+\end{figure}
+
+<<employ.t, echo=FALSE, results='asis', fig.align='center'>>=
+latex(tabl.emplrec2,
+      title="Variables",
+      file = "",
+      append = TRUE,
+      rgroup = "Employment status",
+      #n.rgroup = c(6
+       #            ),
+      colhead = c("Prevalence","Population Total (N)", "OR", "OR(SE)", "p-value"),
+      longtable = F,
+      table.env = T,
+      here = T,
+      caption = paste(set_Measure, " among adults by employment status,", set_Years,
+                      sep = " "),
+      label = "tab:employ")
+@
+
+%### Health Region ######################################################################
+\newpage
+\begin{itemize}
+
+\item Figure \ref{fig:hregion} shows that the
+\Sexpr{rownames(tabl.hregion)[which.max(t.asma.current.hregion.df[1:6,2] *10000)]}
+health region have a highest \Sexpr{set_MeasureL}.
+
+\item Those living in the health region of \Sexpr{capitalize(Funct4Interp(type = "or", tabl.hregion, "had"))} of reporting current asthma than those living in the health region of Aguadilla. 
+(see Table \ref{tab:hregion}).
+
+\end{itemize}
+
+\begin{figure}[H]
+\caption{\Sexpr{set_Measure} among \Sexpr{set_Population} by health region, 
+\Sexpr{set_Years}}
+\label{fig:hregion}
+<<p.hregion, fig.align='center', echo=FALSE, fig.height=3.5, fig.width=7>>=
+p.asma.current.hregion
+@
+\end{figure}
+
+<<hregion.t, echo=FALSE, results='asis', fig.align='center'>>=
+latex(tabl.hregion,
+      title="Variables",
+      file = "",
+      append = TRUE,
+      rgroup = "Health region",
+      #n.rgroup = c(6
+       #            ),
+      colhead = c("Prevalence","Population Total (N)", "OR", "OR(SE)", "p-value"),
+      longtable = F,
+      table.env = T,
+      here = T,
+      caption = paste(set_Measure, " among adults by health region,", set_Years,
+                      sep = " "),
+      label = "tab:hregion")
+@
+
+%%
+\newpage
+\subsection{Health related quality of life}
+Health Related Quality of Life (HRQOL) measures are humanistic outcomes (ISPOR) recognized to supplement traditional measures of morbidity and mortality (CDC 2000; other). HRQOL have been previously used to describe the health perception of persons with asthma. Early studies by Juniper et al. described a relationship between asthma severity and quality of life impairment. \cite{Juniper_1992} Ford et al. (2003) found that persons with asthma reported worse health-related quality of life than respondents who previously had asthma or those who never had asthma \cite{Ford_2003}. Moreover, uncontrolled asthma has been linked to lower adult and pediatric HRQOL (Dean 2009). These measures are considered valid indicators of service need, interventions outcomes, support surveillance efforts for identifying health disparities and tracking population trends (CDC 2000). This section present the current asthma prevalence among adults within those who aswer the HRQOL questions.
+
+\newpage
+<<hrqol.t, echo=FALSE, results='hide'>>=
+t.asma.current.hrqol <- rbind(t.asma.current.fairpoor.m, t.asma.current.physhlcat.m,
+                      t.asma.current.mentdist.m, t.asma.current.poorhlcat.m,
+                      t.asma.current.unhlthy.m)
+@
+
+\begin{itemize}
+
+\item As seen in Figure \ref{fig:fairpoor} shows that \Sexpr{set_MeasureL} in persons who perceive their health
+as \Sexpr{tolower(rownames(tabl.fairpoor)[2])}, was 
+\ifthenelse{
+\Sexpr{floor(as.numeric(t.asma.current.fairpoor.df[1,2])*10000)} < 
+\Sexpr{floor(as.numeric(t.asma.current.fairpoor.df[2,2])*10000)}}{higher}{lower}
+than those who claim to have a \Sexpr{tolower(rownames(tabl.fairpoor)[1])} health.
+
+\item Adults who perceive their health as fair or poor had \Sexpr{Funct4Interp(tabl.fairpoor, "est", type = "or")} \Sexpr{set_MeasureL} when compared with those who perceived their health as very good. \Sexpr{Funct4Interp(tabl.fairpoor, "sig", type = "or")} Data shown in Table \ref{tab:fairpoor}.
+
+\end{itemize}
+
+\begin{figure}[H]
+\caption{\Sexpr{set_Measure} among \Sexpr{set_Population} according to health perception,
+\Sexpr{set_Years}}
+\label{fig:fairpoor}
+<<poorh, fig.align='center', echo=FALSE, fig.height=3.5, fig.width=5>>=
+p.asma.current.fairpoor
+@
+\end{figure}
+
+<<poorh.t, echo=FALSE, results='asis', fig.align='center'>>=
+latex(tabl.fairpoor,
+      title="Variables",
+      file = "",
+      append = TRUE,
+      rgroup = "Health Perception",
+      #n.rgroup = c(6
+       #            ),
+      colhead = c("Prevalence","Population Total (N)", "OR", "OR(SE)", "p-value"),
+      longtable = F,
+      table.env = T,
+      here = T,
+      caption = paste(set_Measure, " among adults according to health perception,", set_Years,
+                      sep = " "),
+      label = "tab:fairpoor")
+@
+
+\newpage
+\begin{itemize}
+
+\item Adults who reported being physically unhealthy for 14 days or more in the past 30 days, had an asthma prevalence that was 
+\ifthenelse{
+\Sexpr{floor(as.numeric(t.asma.current.physhlcat.df[1,2])*10000)} >
+\Sexpr{floor(as.numeric(t.asma.current.physhlcat.df[2,2])*10000)}}{lower}{higher} when compared with 
+those who reported being physically unhealthy for less than 13 days in the last 30 days.
+
+%\item Table \ref{tab:phys} shows the estimations of the \Sexpr{set_Measure}.
+
+\item Adults who felt physically impaired for \Sexpr{Funct4Interp(type = "or", tabl.physhlcat, "yn")} (See Table \ref{tab:phys}).
+
+\end{itemize}
+
+\begin{figure}[H]
+\caption{\Sexpr{set_Measure} among \Sexpr{set_Population} acording to physical health perception, \Sexpr{set_Years}}
+\label{fig:phys}
+<<physchlcat, fig.align='center', echo=FALSE, fig.height=3.5, fig.width=5>>=
+p.asma.current.physchlcat
+@
+\end{figure}
+
+<<physhlcat.t, echo=FALSE, results='asis', fig.align='center'>>=
+latex(tabl.physhlcat,
+      title="Variables",
+      file = "",
+      append = TRUE,
+      rgroup = "Physical Health",
+      #n.rgroup = c(6
+       #            ),
+      colhead = c("Prevalence","Population Total (N)", "OR", "OR(SE)", "p-value"),
+      longtable = F,
+      table.env = T,
+      here = T,
+      caption = paste(set_Measure, "among adults by physical health perception,",
+                      set_Years,
+                      sep = " "),
+      label = "tab:phys")
+@
+
+\newpage
+\begin{itemize}
+
+\item \Sexpr{set_Measure} among adults who reported feeling mentally unhealthy in more than 13 days in the last month, was \ifthenelse{\Sexpr{floor(as.numeric(t.asma.current.mentdist.df[1,2])*10000)} < 
+\Sexpr{floor(as.numeric(t.asma.current.mentdist.df[2,2])*10000)}}{lower}{higher} when compared with their counterpart.
+
+%\item \Sexpr{set_Measure} for this groups are presented in the Table \ref{tab:mental}.
+
+\item Figure \ref{fig:mental} shows that adults who felt mentally impaired for \Sexpr{Funct4Interp(type = "or", tabl.mentdist, "yn")} (See Table \ref{tab:mental}).
+
+\end{itemize}
+
+\begin{figure}[H]
+\centering
+\caption{\Sexpr{set_Measure} among \Sexpr{set_Population} by days of frequent mental distress, \Sexpr{set_Years}}
+\label{fig:mental}
+<<mentdist, fig.align='center', echo=FALSE, fig.height=3.5, fig.width=6>>=
+p.asma.current.mentdist
+@
+\end{figure}
+
+<<mentdist.t, echo=FALSE, results='asis', fig.align='center'>>=
+latex(tabl.mentdist,
+      title="Variables",
+      file = "",
+      append = TRUE,
+      rgroup = "Mental Health",
+      #n.rgroup = c(6
+       #            ),
+      colhead = c("Prevalence","Population Total (N)", "OR", "OR(SE)", "p-value"),
+      longtable = F,
+      table.env = T,
+      here = T,
+      caption = paste(set_Measure, "among", set_Population,
+                      "by days of frequent mental distress,",
+                      set_Years,
+                      sep = " "),
+      label = "tab:mental")
+@
+
+\newpage
+\begin{itemize}
+
+\item A \ifthenelse{
+\Sexpr{floor(as.numeric(t.asma.current.poorhlcat.df[1,2])*10000)} > 
+\Sexpr{floor(as.numeric(t.asma.current.poorhlcat.df[2,2])*10000)}}{lower}{higher} 
+\Sexpr{set_MeasureL} was observed amont adults who were unable to do their daily activties 14 days or more, when compared with the other group. Refere to Figure \ref{fig:poor}).
+
+\item Persons who couldn't complete their daily activities for \Sexpr{Funct4Interp(type = "or", tabl.poorhlcat, "yn")}
+
+\end{itemize}
+
+\begin{figure}[H]
+\caption{\Sexpr{set_Measure} among \Sexpr{set_Population} who were unable to work due to physical 
+or mental impediment, \Sexpr{set_Years}}
+\label{fig:poor}
+<<poor, fig.align='center', echo=FALSE, fig.height=3.5, fig.width=5>>=
+p.asma.current.poorhlcat
+@
+\end{figure}
+
+<<poor.t, echo=FALSE, results='asis', fig.align='center'>>=
+latex(tabl.poorhlcat,
+      title="Variables",
+      file = "",
+      append = TRUE,
+      rgroup = "Days unable to work",
+      #n.rgroup = c(6
+       #            ),
+      colhead = c("Prevalence","Population Total (N)", "OR", "OR(SE)", "p-value"),
+      longtable = F,
+      table.env = T,
+      here = T,
+      caption = paste(set_Measure, "among", set_Population, "who were unable to work due to physical or mental impediment,", set_Years,
+                      sep = " "),
+      label = "tab:poor")
+@
+
+\newpage
+\begin{itemize}
+
+\item As seen in Figure \ref{fig:unhlthy}, those adults who felt mentally or physically unhealthy for more than 14 days in the last 30 days, had a \ifthenelse{
+\Sexpr{floor(as.numeric(substr(t.asma.current.hrqol[9,1],1,4))*100)}>
+\Sexpr{floor(as.numeric(substr(t.asma.current.hrqol[10,1],1,4))*100)}}{lower}{higher} 
+\Sexpr{set_MeasureL} when compared with their counterpart.
+
+%\item The prevalence for those who felt mentally or fisically unhealthy is more than twice of the
+%prevalence of those who felt healthy for at least 14 days in the past 30(Table \ref{tab:unhlthy}).
+
+\item Those persons who felt mentally or physically unhealthy for \Sexpr{Funct4Interp(type = "or", tabl.unhlthy, "yn")} Data shown in Table \ref{tab:unhlthy}.
+
+\end{itemize}
+
+\begin{figure}[H]
+\caption{\Sexpr{set_Measure} among \Sexpr{set_Population} by unhealthy days, \Sexpr{set_Years}}
+\label{fig:unhlthy}
+<<unhealthy, fig.align='center', echo=FALSE, fig.height=3.5, fig.width=5>>=
+p.asma.current.unhlthy
+@
+\end{figure}
+
+<<unhealthy.t, echo=FALSE, results='asis', fig.align='center'>>=
+latex(tabl.unhlthy,
+      title="Variables",
+      file = "",
+      append = TRUE,
+      rgroup = "Unhealthy Days",
+      #n.rgroup = c(6
+       #            ),
+      colhead = c("Prevalence","Population Total (N)", "OR", "OR(SE)", "p-value"),
+      longtable = F,
+      table.env = T,
+      here = T,
+      caption = paste(set_Measure, "among", set_Population, "by unhealthy days,", set_Years,
+                      sep = " "),
+      label = "tab:unhlthy")
+@
+
+\newpage
+\subsection{Risk \& comorbidities}
+
+Based on the Dictionary of Epidemiology a behavioral risk factors are a characteristic of behavior that is associated with increased probability of a specified outcome; the term does not imply a causal relationship. \cite{Last_2001} A comorbidity is a disease(s) that coexist(s) in a study participant in addition to the index condition that is the subject of study. \cite{Last_2001}.  In this section we provides a brief description of risk factors and comorbid conditions that can guide hypothesis in understanding the burden of asthma in Puerto Rico.
+
+
+\newpage
+\begin{itemize}
+
+\item Adults who reported not beign physically active are not athletically active had a
+\Sexpr{set_MeasureL} \ifthenelse{
+\Sexpr{floor(as.numeric(t.asma.current.exerany2.df[1,2])*10000)} > 
+\Sexpr{floor(as.numeric(t.asma.current.exerany2.df[2,2])*10000)}}{lower}{higher}
+than those who are (Figure \ref{fig:exe}).
+
+\item Adults who don't make exercise had \Sexpr{Funct4Interp(type = "or", tabl.exerany2, "est")} \Sexpr{set_MeasureL} when compared with those who do.
+
+\end{itemize}
+
+\begin{figure}[H]
+\caption{\Sexpr{set_Measure} among athletically active/inactive \Sexpr{set_Population}, 
+\Sexpr{set_Years}}
+\label{fig:exe}
+<<exer, fig.align='center', echo=FALSE, fig.height=4, fig.width=5>>=
+p.asma.current.exerany2
+@
+\end{figure}
+
+<<exer.t, echo=FALSE, results='asis', fig.align='center'>>=
+latex(tabl.exerany2,
+      title="Variables",
+      file = "",
+      append = TRUE,
+      rgroup = "Exercise",
+      #n.rgroup = c(6
+       #            ),
+      colhead = c("Prevalence","Population Total (N)", "OR", "OR(SE)", "p-value"),
+      longtable = F,
+      table.env = T,
+      here = T,
+      caption = paste(set_Measure, "among", set_Population, "by physical exercise status,",
+                      set_Years, sep = " "),
+      label = "tab:exe")
+@
+
+\newpage
+\begin{itemize}
+
+\item A tendency in the three BMI categories evaluated was observed, 
+in which those who are neither overweight nor obese had a  
+\ifthenelse{
+\Sexpr{floor(as.numeric(t.asma.current.bmi4cat.df[1,2])*10000)} < 
+\Sexpr{floor(as.numeric(t.asma.current.bmi4cat.df[2,2])*10000)}}{lower}{higher} 
+asthma prevalence (Figure \ref{fig:bmi}).
+
+%\item As BMI increases, \Sexpr{set_Measure} increases. This can be observed in Figure \ref{fig:bmi}
+
+\item Those adults who were classified as \Sexpr{Funct4Interp(type = "or", tabl.bmi4cat, "bmi")} Data shown in Table \ref{tab:bmi}.
+
+\end{itemize}
+
+\begin{figure}[H]
+\caption{\Sexpr{set_Measure} among \Sexpr{set_Population} by BMI level, \Sexpr{set_Years}}
+\label{fig:bmi}
+<<bmi, fig.align='center', echo=FALSE, fig.height=3.5, fig.width=5>>=
+p.asma.current.bmi4cat
+@
+\end{figure}
+
+<<bmi.t, echo=FALSE, results='asis', fig.align='center'>>=
+latex(tabl.bmi4cat,
+      title="Variables",
+      file = "",
+      append = TRUE,
+      rgroup = "BMI Category",
+      #n.rgroup = c(6
+       #            ),
+      colhead = c("Prevalence","Population Total (N)", "OR", "OR(SE)", "p-value"),
+      longtable = F,
+      table.env = T,
+      here = T,
+      caption = paste(set_Measure, "among", set_Population, "by BMI categories,", set_Years,
+                      sep = " "),
+      label = "tab:bmi")
+@
+
+\newpage
+\begin{itemize}
+
+\item Figure \ref{fig:smoke} shows that \Sexpr{set_MeasureL} among smokers was \ifthenelse{
+\Sexpr{floor(as.numeric(t.asma.current.rfsmok3.df[1,2])*10000)} > 
+\Sexpr{floor(as.numeric(t.asma.current.rfsmok3.df[2,2])*10000)}}{lower}{higher} than non-smokers.
+
+\item Adults who smoke had \Sexpr{Funct4Interp(type = "or", tabl.rfsmok3, "est")} of having \Sexpr{set_MeasureL} when compared with those who don't. \Sexpr{Funct4Interp(type = "or", tabl.rfsmok3, "sig")}
+
+\end{itemize}
+
+\begin{figure}[H]
+\caption{\Sexpr{set_Measure} among \Sexpr{set_Population} by smoking status, \Sexpr{set_Years}}
+\label{fig:smoke}
+<<smoke, fig.align='center', echo=FALSE, fig.height=4, fig.width=5>>=
+p.asma.current.rfsmok3
+@
+\end{figure}
+
+<<smoke.t, echo=FALSE, results='asis', fig.align='center'>>=
+latex(tabl.rfsmok3,
+      title="Variables",
+      file = "",
+      append = TRUE,
+      rgroup = "Smoke",
+      #n.rgroup = c(6
+       #            ),
+      colhead = c("Prevalence","Population Total (N)", "OR", "OR(SE)", "p-value"),
+      longtable = F,
+      table.env = T,
+      here = T,
+      caption = paste(set_Measure, "among", set_Population, "by smoking status,", set_Years,
+                      sep = " "),
+      label = "tab:smoke")
+@
+
+\newpage
+\begin{itemize}
+
+\item Adults with a diabetes diagnosis had a \Sexpr{set_MeasureL} 
+\ifthenelse{
+\Sexpr{floor(as.numeric(t.asma.current.diabetes.df[1,2])*10000)} < 
+\Sexpr{floor(as.numeric(t.asma.current.diabetes.df[2,2])*10000)}}{lower}{higher} than those without the diagnosis.
+
+%\item Table \ref{tab:diabetes} shows the difference between these prevalences.
+
+\item Diabetes patients at the time of the interview had \Sexpr{Funct4Interp(type = "or", tabl.diabetes, "est")} \Sexpr{set_MeasureL} when compared with those non-diabetics. \Sexpr{Funct4Interp(type = "or", tabl.diabetes, "sig")}
+
+\end{itemize}
+
+\begin{figure}[H]
+\caption{\Sexpr{set_Measure} among \Sexpr{set_Population} by diabetes status,
+\Sexpr{set_Years}}
+\label{fig:diabetes}
+<<diabetes, fig.align='center', echo=FALSE, fig.height=4, fig.width=5>>=
+p.asma.current.diabetes
+@
+\end{figure}
+
+<<diabetes.t, echo=FALSE, results='asis', fig.align='center'>>=
+latex(tabl.diabetes,
+      title="Variables",
+      file = "",
+      append = TRUE,
+      rgroup = "Diabetes",
+      #n.rgroup = c(6
+       #            ),
+      colhead = c("Prevalence","Population Total (N)", "OR", "OR(SE)", "p-value"),
+      longtable = F,
+      table.env = T,
+      here = T,
+      caption = paste(set_Measure, "among", set_Population, "by diabetes status,", set_Years,
+                      sep = " "),
+      label = "tab:diabetes")
+@
+
+\newpage
+\begin{itemize}
+
+\item Those persons with one or more chronic diseases, 
+had a \ifthenelse{
+\Sexpr{floor(as.numeric(t.asma.current.anychronc.df[1,2])*10000)} >
+\Sexpr{floor(as.numeric(t.asma.current.anychronc.df[2,2])*10000)}}{lower}{higher} \Sexpr{set_MeasureL} than those without
+any chronic disease.
+
+%\item An estimate of the population total from the years \Sexpr{set_Years} is shown in Table 
+%\ref{tab:anychronc}.
+
+\item When asked if the adult respondent has any chronic disease, those who answer having 
+\Sexpr{Funct4Interp(type = "or", tabl.anychronc, "yn")} (See Table \ref{tab:anychronc}).
+
+\end{itemize}
+
+\begin{figure}[H]
+\caption{\Sexpr{set_Measure} among \Sexpr{set_Population} by any other chronic diseases,
+\Sexpr{set_Years}}
+\label{fig:anychronc}
+<<cvdcrhd, fig.align='center', echo=FALSE, fig.height=4, fig.width=5, dev='jpeg'>>=
+p.asma.current.anychronc
+@
+\end{figure}
+
+<<cvdcrhd.t, echo=FALSE, results='asis', fig.align='center'>>=
+latex(tabl.anychronc,
+      title="Variables",
+      file = "",
+      append = TRUE,
+      rgroup = "Chronic Disease",
+      #n.rgroup = c(6
+       #            ),
+      colhead = c("Prevalence","Population Total (N)", "OR", "OR(SE)", "p-value"),
+      longtable = F,
+      table.env = T,
+      here = T,
+      caption = paste(set_Measure, "among", set_Population,
+                      "by presence of any other chronic disease,", set_Years,
+                      sep = " "),
+      label = "tab:anychronc")
+@
+
+\newpage
+\section{Results: Asthma among children}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%% USA vs PR among children
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{figure}[H]
+\caption{\Sexpr{set_Measure} among \Sexpr{set_PopulationC}ren in \Sexpr{set_Country}, \Sexpr{set_Years}}
+\label{fig:PRchild2011}
+<<PRvsUSAchild, fig.align='center', echo=FALSE, fig.height=4, fig.width=7, dev='jpeg'>>=
+p.current.child.year
+@
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%% Interpretation PR among children
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{itemize}
+
+\item The \Sexpr{set_Years} \Sexpr{set_MeasureL} among \Sexpr{set_PopulationC}ren in \Sexpr{set_Country}, was \Sexpr{t.current.child.year.m} Figure \ref{fig:PRchild2011}
+
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+
+\begin{itemize}
+
+\item The highest \Sexpr{set_MeasureL} among children was in the \Sexpr{tolower(rownames(tabl.cageg)[which.max(t.current.child.age[1:4,2] *10000)])} age group.
+
+\item Children in the age group of \Sexpr{Funct4Interp(type = "or", tabl.cageg, "the")} (See Table \ref{tab:agech}).
+
+\end{itemize}
+
+\begin{figure}[H]
+\caption{\Sexpr{set_Measure} among children by age group, \Sexpr{set_Years}}
+\label{fig:agech}
+<<agech, fig.align='center', echo=FALSE, fig.height=3.5, fig.width=5>>=
+p.current.child.age
+@
+\end{figure}
+
+<<agech.t, echo=FALSE, results='asis', fig.align='center'>>=
+latex(tabl.cageg,
+      title="Variables",
+      file = "",
+      append = TRUE,
+      rgroup = "Child Age",
+      #n.rgroup = c(6
+       #            ),
+      colhead = c("Prevalence","Population Total (N)", "OR", "OR(SE)", "p-value"),
+      longtable = F,
+      table.env = T,
+      here = T,
+      caption = paste(set_Measure, "among children by age group,", set_Years,   sep = " "),
+      label = "tab:agech")
+@
+
+\newpage
+\begin{itemize}
+
+\item Figure \ref{fig:sexch} shows higher \Sexpr{set_MeasureL} among 
+\Sexpr{tolower(rownames(tabl.csexg)[which.max(t.current.child.sex[,c("prev")])])} children.
+
+\item In children, \Sexpr{Funct4Interp(type = "or", tabl.csexg, "sex")} (See Table \ref{tab:sexch}).
+
+\end{itemize}
+
+\begin{figure}[H]
+\caption{\Sexpr{set_Measure} among children by sex, \Sexpr{set_Years}}
+\label{fig:sexch}
+<<sexch, fig.align='center', echo=FALSE, fig.height=4, fig.width=5>>=
+p.current.child.sex
+@
+\end{figure}
+
+<<sexch.t, echo=FALSE, results='asis', fig.align='center'>>=
+latex(tabl.csexg,
+      title="Variables",
+      file = "",
+      append = F,
+      rgroup = "Child sex",
+      #n.rgroup = c(6
+       #            ),
+      colhead = c("Prevalence","Population Total (N)", "OR", "OR(SE)", "p-value"),
+      longtable = F,
+      table.env = T,
+      here = T,
+      caption = paste(set_Measure, "among children by sex,", set_Years,
+                      sep = " "),
+      label = "tab:sexch")
+@
+
+
+%### Child Health Region ######################################################################
+\newpage
+\begin{itemize}
+
+\item As observed in Figure \ref{fig:hregionch} children who lived in the
+\Sexpr{rownames(tabl.chregion)[which.max(t.current.child.hregion.df[1:6,2] *10000)]},
+health region have a highest \Sexpr{set_MeasureL}.
+
+\item Those living in the health region of \Sexpr{capitalize(Funct4Interp(type = "or", tabl.chregion, "had"))} than those living in the health region of Aguadilla. Data shown in Table \ref{tab:chregion}.
+
+\end{itemize}
+
+\begin{figure}[H]
+\caption{\Sexpr{set_Measure} among children by health region, 
+\Sexpr{set_Years}}
+\label{fig:hregionch}
+<<p.chregion, fig.align='center', echo=FALSE, fig.height=3.5, fig.width=7, dev='jpeg'>>=
+p.current.child.hregion
+@
+\end{figure}
+
+<<chregion.t, echo=FALSE, results='asis', fig.align='center'>>=
+latex(tabl.chregion,
+      title="Variables",
+      file = "",
+      append = TRUE,
+      rgroup = "Health region",
+      #n.rgroup = c(6
+       #            ),
+      colhead = c("Prevalence","Population Total (N)", "OR", "OR(SE)", "p-value"),
+      longtable = F,
+      table.env = T,
+      here = T,
+      caption = paste(set_Measure, " among children by respondent health region,", set_Years,
+                      sep = " "),
+      label = "tab:chregion")
+@
+
+\newpage
+\begin{itemize}
+ 
+\item Figure \ref{fig:incomgch} shows that children whose parents or guardian's annual income was 
+\Sexpr{tolower(rownames(tabl.cincomg)[which.max(t.current.child.incomg[,c("prev")])])}, 
+had a higher \Sexpr{set_MeasureL}.
+
+\item Children whose parents or guardian's annual income was \Sexpr{Funct4Interp(type = "or", tabl.cincomg, "had")} \Sexpr{set_MeasureL} when compared with those whose annual income is less than \%15,000.
+
+\end{itemize}
+
+\begin{figure}[H]
+\caption{\Sexpr{set_Measure} among children by annual income of the interviewee, 
+\Sexpr{set_Years}}
+\label{fig:incomgch}
+<<incomgch, fig.align='center', echo=FALSE, fig.height=3.5, fig.width=5>>=
+p.current.child.incomg
+@
+\end{figure}
+
+<<incomgch.t, echo=FALSE, results='asis', fig.align='center'>>=
+latex(tabl.cincomg,
+      title="Variables",
+      file = "",
+      append = TRUE,
+      rgroup = "Annual income",
+      #n.rgroup = c(6
+       #            ),
+      colhead = c("Prevalence","Population Total (N)", "OR", "OR(SE)", "p-value"),
+      longtable = F,
+      table.env = T,
+      here = T,
+      caption = paste(set_Measure, "among children by annual income of the interviewee ,",
+                      set_Years,
+                      sep = " "),
+      label = "tab:incomgch")
+@
+
+\newpage
+\begin{itemize}
+
+\item \Sexpr{set_Measure} among children was higher where interviewees described their marital status as 
+\Sexpr{tolower(rownames(tabl.cmarital2)[which.max(t.current.child.marital2[1:6,2] *10000)])}.
+
+\item Children of households where the interviewees responded their marital status as 
+\Sexpr{Funct4Interp(type = "or", tabl.cmarital2, "had")} \Sexpr{set_MeasureL} when compared with those whose parents or gurdians where maried. (See Table \ref{tab:marital2ch}).
+
+\end{itemize}
+
+\begin{figure}[H]
+\caption{\Sexpr{set_Measure} among children by marital status of the interviewee, 
+\Sexpr{set_Years}}
+\label{fig:marital2ch}
+<<marital2ch, fig.align='center', echo=FALSE, fig.height=3.5, fig.width=7>>=
+p.current.child.marital2
+@
+\end{figure}
+
+<<maritalch.t, echo=FALSE, results='asis', fig.align='center'>>=
+latex(tabl.cmarital2,
+      title= "Variables",
+      file = "",
+      append = TRUE,
+      rgroup = "Marital status",
+      #n.rgroup = c(6
+       #            ),
+      colhead = c("Prevalence","Population Total (N)", "OR", "OR(SE)", "p-value"),
+      longtable = F,
+      table.env = T,
+      here = T,
+      caption = paste(set_Measure, "among children by marital status of the interviewee,",
+                      set_Years, 
+                      sep = " "),
+      label = "tab:marital2ch")
+@
+
+
+\newpage
+\begin{itemize}
+
+\item Children of households where interviewees responded their
+employment status as 
+``\Sexpr{tolower(rownames(tabl.cemplrec2)[which.max(t.current.child.employ[1:4,2] *10000)])}"
+have the highest \Sexpr{set_MeasureL} compared to other
+employment status. See Figure \ref{fig:employch} for more information
+
+\item Children of households where interviewees responded being a
+\Sexpr{Funct4Interp(type = "or", tabl.cemplrec2, "being")} Data shown in Table \ref{tab:employch}.
+
+\end{itemize}
+
+\begin{figure}[H]
+\caption{\Sexpr{set_Measure} among children by employment status of the interviewee, 
+\Sexpr{set_Years}}
+\label{fig:employch}
+<<employch, fig.align='center', echo=FALSE, fig.height=3, fig.width=6>>=
+p.current.child.employ
+@
+\end{figure}
+
+<<employch.t, echo=FALSE, results='asis', fig.align='center'>>=
+latex(tabl.cemplrec2,
+      title="Variables",
+      file = "",
+      append = TRUE,
+      rgroup = "Employment status",
+      #n.rgroup = c(6
+       #            ),
+      colhead = c("Prevalence","Population Total (N)", "OR", "OR(SE)", "p-value"),
+      longtable = F,
+      table.env = T,
+      here = T,
+      center = "centering",
+      caption = paste(set_Measure, "among children by employment status of the interviewee,",
+                      set_Years,
+                      sep = " "),
+      label = "tab:employch")
+@
+
+
+\newpage
+\section{Remarks}
+
+This report suggest that asthma in Puerto Rico should continue be considered a priority for the public health authorities in \Sexpr{set_Country}. An estimate of \Sexpr{format(data.frame(svytotal(~currasth, design = brfss.sd, na.rm = TRUE))[2, "total"], scientific = 1, big.mark = "," )} (\Sexpr{data.frame(svymean(~currasth, design = brfss.sd, na.rm = TRUE))[2, "mean"] * 100}\%) adult and \Sexpr{format(data.frame(svytotal(~ccurasth, design = cbrfss.sd, na.rm = TRUE))[2, "total"], scientific = 1, big.mark = ",")} (\Sexpr{data.frame(svymean(~ccurasth, design = cbrfss.sd, na.rm = TRUE))[2, "mean"] * 100}\%) children in Puerto Rico had \Sexpr{set_MeasureL} as of the period of \Sexpr{set_Years}. When evaluating by the socio-demographic variables, no specific group has been disproportionately affected with asthma prevalence in age groups, educational level or marital status. With regards to gender the asthma prevalence was \Sexpr{tabl.sex[2, "OR"]} times higher in women. Although not statistically significant those in the household income range of $35k-<50k$ and $50+$ had \Sexpr{1 - as.numeric(tabl.incomg["35k-<50k", "OR"])} and \Sexpr{1 - as.numeric(tabl.incomg["50+k", "OR"])} respectively less possibility of \Sexpr{set_MeasureL} that the group in the $<15k$ income range.
+
+
+Moving to the health related quality of life measures, the possibility of reporting \Sexpr{set_MeasureL} in adults that perceived their health as fair or poor was \Sexpr{tabl.fairpoor[2, "OR"]} times higher than those who considered their health as good, very good or excellent. The adults who said that they felt physically bad for 14 days or more for the last 30 days had \Sexpr{tabl.physhlcat[2, "OR"]} times higher possibility of report \Sexpr{set_MeasureL} than those reporting less than 13 days. In the same manner, adults who felt mentally distress for 14 days or more in a month had \Sexpr{tabl.mentdist[2, "OR"]} times higher possibility of report \Sexpr{set_MeasureL} than those reporting less than 13 days. From 1.6 million adults who were unable to carry on with their normal activities more than 14 days in a month \Sexpr{tabl.unhlthy[2, "Prevalence"]} percent reported \Sexpr{set_MeasureL}. 
+
+People who exercise, or are exposed to physical activities reported \Sexpr{1 - as.numeric(tabl.exerany2["No", "OR"])} \% higher risk than those who don't.  Regarding, body mass index (BMI) those obese and overweight had \Sexpr{1 - as.numeric(tabl.bmi4cat[2, "OR"])}\% and \Sexpr{as.numeric(tabl.bmi4cat[3, "OR"]) - 1}\% more possibility of \Sexpr{set_MeasureL} than those neither obese nor overweight. The estimation of the \Sexpr{set_MeasureL} on smokers was \Sexpr{tabl.rfsmok3[c("Yes"),1]} percent.  Adults with diabetes were \Sexpr{as.numeric(tabl.diabetes[2, "OR"]) - 1}\5 more likely to have \Sexpr{set_MeasureL} than their counterpart.
+
+%OR in asthma among children was evaluated using the information provided by their parents. Sociodemographic variables shown in this part of the report are not directly related to the child but to the parent, but understanding that the child is also exposed to the sociodemographic status of their parent, we use it as their own. 
+
+Regarding children estimates those in the \Sexpr{rownames(tabl.cageg)[2]} age group reported a \Sexpr{set_MeasureL} of \Sexpr{tabl.cageg[2,1]} percent. \Sexpr{print(toString(floor(as.numeric(tabl.cageg[2, 2]) * t.current.child.age[2,c("prev")])))} \Sexpr{rownames(tabl.csexg)[1]} children have a \Sexpr{t.current.child.sex[c("Male"), c("prev")] / t.current.child.sex[c("Female"),c("prev")]} times higher \Sexpr{set_MeasureL} than their counterpart. Children whose parents annual income is less than \$15,000, reported to have a \Sexpr{set_MeasureL} of \Sexpr{tabl.cincomg[1,1]} percent.  Among employment status, The only group with significant difference was the \Sexpr{names(which.min(tabl.cemplrec2[, "OR"]))} group with \Sexpr{min(tabl.cemplrec2[, "OR"])} less possibility of \Sexpr{set_MeasureL} than the reference group.
+
+%The population estimations presented in each table for the different years, where calculated with the total estimate population by the BRFSS for each year. Approximately, 151,325 adults in Puerto Rico could not complete their daily activities (work, studies, etc.) in the year 2010 due to physical or mental unhealthiness in the month before they were interviewed, 30,140 of which were absent for at least 14 days of that month. Approximately 140,500 of the persons in Puerto Rico that perceive their health as \Sexpr{tolower(rownames(t.asma.current.hrqol)[2])}, had \Sexpr{set_MeasureL} in 2010. For the year 2010, approximately 87,355 persons in \Sexpr{set_Country} with other chronic diseases (stroke, heart problems, etc.) also had asthma. 
+
+%\newpage
+%\vspace{1cm}
+
+Progress has been made in understanding the burden of asthma in \Sexpr{set_Country}. Advancements in the diagnose and treatment of the condition have had considerably improve in the last 20 years, but it still an uncontrolled condition. The disclosed information is part of the effort of the Puerto Rico Asthma Project to provide an update of the state of asthma in our country. The report present information that can aid in the development of public policy, guide changes in the health care system, monitor population asthma control, enhance educational material, and guide all efforts to target factors of disparities as a way of reducing morbidity and mortality associated with asthma in \Sexpr{set_Country}.
+
+%Summary tables
+\newpage
+\section{Summary tables}
+In this section we provide a set of summary tables of current asthma prevalence among adults and children in Puerto Rico, for the years \Sexpr{set_Years}. The tables aggregate all the analysis conducted in this report for an easy to print and carry document for reference, or to be use as annex for the preparation of other document such as an application for funds. For the interpretation of each result, please refer to the corresponding section on the document.
+
+\subsection{Adults}
+<<SocioD_tabl, echo=FALSE, results='hide', warning=FALSE, message=FALSE>>=
+# Create a socio demographic table
+SocioD.tabl <- rbind(tabl.ageg2, tabl.sex, tabl.educag3, tabl.incomg, tabl.marital,
+                     tabl.emplrec2, tabl.hregion)
+@
+
+<<Socio_tablTex, echo=FALSE, results='asis'>>=
+
+latex(object = SocioD.tabl,
+      title = "Variables", file = "",
+      append = TRUE,
+      rgroup = c("Age group", "Gender", "Escolarity", "Household income",
+                 "Marital status", "Employment status", "Health region"),
+      n.rgroup = c(6, 2, 4, 5, 6, 6, 8),
+      table.env = T,
+      longtable = F,
+      here = T,
+      caption = paste(set_Measure, " among adults by Socio-demographic variables,", set_Years,
+                      sep = " "),
+      label = "tab:SocioD.tabl")
+
+@
+
+<<HRQOL_tabl, echo=FALSE, results='hide', warning=FALSE, message=FALSE>>=
+hrqol.tabl <- rbind(tabl.fairpoor, tabl.physhlcat, tabl.mentdist, tabl.poorhlcat,
+                    tabl.unhlthy)
+@
+
+<<hrqol.tablTex, echo=FALSE, results='asis'>>=
+
+latex(object = hrqol.tabl,
+      title = "Variables", file = "",
+      append = TRUE,
+      rgroup = c("Health perception", "Physical unhealthy", "Mental unhealthy",
+                 "Activity limitation", "Physical and mental unhealthy"),
+      n.rgroup = c(2, 2, 2, 2, 2),
+      table.env = T,
+      here = T,
+      caption = paste(set_Measure, " among adults by health related quality of life variables,", set_Years,
+                      sep = " "),
+      label = "tab:hrqol.tabl")
+@
+
+<<RiskComo_tabl, echo=FALSE, results='hide', warning=FALSE, message=FALSE>>=
+riskComo.tabl <- rbind(tabl.exerany2, tabl.bmi4cat, tabl.rfsmok3, tabl.diabetes,
+                       tabl.anychronc)
+@
+
+<<RiskComo_tablTex, echo=FALSE, results='asis'>>=
+
+latex(object = riskComo.tabl,
+      title = "Variables", file = "",
+      append = TRUE,
+      rgroup = c("Exercise", "BMI", "Smoker", "Diabetes diagnosis", "Any chronic condition"),
+      n.rgroup = c(2, 3, 2, 2, 2),
+      table.env = T,
+      here = T,
+      caption = paste(set_Measure, " among adults by risk and comorbidity variables,", set_Years,
+                      sep = " "),
+      label = "tab:riskComo.tabl")
+@
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Child}
+<<DemogChild_tabl, echo=FALSE, results='hide', warning=FALSE, message=FALSE>>=
+# Create a socio demographic table
+Demog_Child.tabl <- rbind(tabl.cageg, tabl.csexg, tabl.chregion)
+@
+
+<<Demog_Child_tablTex, echo=FALSE, results='asis'>>=
+
+latex(object = Demog_Child.tabl,
+      title = "Variables", file = "",
+      append = TRUE,
+      rgroup = c("Age group", "Gender", "Health region"),
+      n.rgroup = c(4, 2, 8),
+      table.env = T,
+      here = T,
+      caption = paste(set_Measure, " among children by child demographic variables,",
+                      set_Years,
+                      sep = " "),
+      label = "tab:Demog_Child.tabl")
+
+@
+
+<<SocioD.Child_tabl, echo=FALSE, results='hide', warning=FALSE, message=FALSE>>=
+# Create a socio demographic table
+Socio_Child.tabl <- rbind(tabl.cincomg, tabl.cmarital2, tabl.cemplrec2)
+@
+
+<<Socio_Child_tablTex, echo=FALSE, results='asis'>>=
+
+latex(object = Socio_Child.tabl,
+      title = "Variables", file = "",
+      append = TRUE,
+      rgroup = c("Household income", "Marital status", "Employment status"),
+      n.rgroup = c(5, 6, 6),
+      table.env = T,
+      here = T,
+      caption = paste(set_Measure, " among children by respondent social variables,",
+                      set_Years,
+                      sep = " "),
+      label = "tab:Socio_Child.tabl")
+
+@
+
+%----------------------------------------------------------------------------------------
+\ClearShipoutPicture
+\newpage 
+\AddToShipoutPicture{\BackgroundPic}
+\bibliographystyle{plain}  % (uses file "plain.bst")
+\bibliography{/media/truecrypt2/Dropbox/Reference_Master_bib/refs_Master.bib}  	% expects file "myrefs.bib"
+
+
+\end{document}
